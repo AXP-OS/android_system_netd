@@ -56,6 +56,7 @@
 #include <unistd.h>
 
 #include <android-base/logging.h>
+#include <android-base/properties.h>
 
 #include "netd_resolv/resolv.h"
 #include "resolv_cache.h"
@@ -1550,6 +1551,9 @@ found:
 }
 
 static bool files_getaddrinfo(const char* name, const addrinfo* pai, addrinfo** res) {
+    if ((android::base::GetIntProperty("persist.security.hosts_disable", 0) != 0) && (strcmp("localhost", name) != 0) && (strcmp("ip6-localhost", name) != 0))
+        return false;
+
     struct addrinfo sentinel = {};
     struct addrinfo *p, *cur;
     FILE* hostf = NULL;
